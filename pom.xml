@@ -50,28 +50,20 @@
     </dependency>
     <dependency>
       <groupId>org.apache.camel.quarkus</groupId>
-      <artifactId>camel-quarkus-core</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.camel.quarkus</groupId>
-      <artifactId>camel-quarkus-bindy</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.camel.quarkus</groupId>
-      <artifactId>camel-quarkus-csv</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.camel.quarkus</groupId>
       <artifactId>camel-quarkus-kafka</artifactId>
     </dependency>
-    <dependency>
-      <groupId>io.quarkus</groupId>
-      <artifactId>quarkus-kafka-client</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.camel.quarkus</groupId>
-      <artifactId>camel-quarkus-http</artifactId>
-    </dependency>
+	<dependency>
+		<groupId>io.quarkus</groupId>
+		<artifactId>quarkus-mutiny</artifactId>
+	</dependency>
+	<dependency>
+		<groupId>io.quarkus</groupId>
+		<artifactId>quarkus-mongodb-client</artifactId>
+	</dependency>
+	<dependency>
+		<groupId>io.quarkus</groupId>
+		<artifactId>quarkus-mongodb-panache</artifactId>
+	</dependency>
 	<dependency>
 		<groupId>org.json</groupId>
 		<artifactId>json</artifactId>
