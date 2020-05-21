@@ -1,6 +1,20 @@
-$('#country').change(function(){
-    sendRequest("/usa/historical/"+$(this).val(),"GET");
-})
+var dropdown = $('#country-dropdown');
+dropdown.empty();
+dropdown.append('<option selected="true" disabled>Choose country</option>');
+dropdown.prop('selectedIndex',0);
+var countriesUrl='reports/countries';
+
+$.getJSON(countriesUrl,function (data) {
+	$.each(data, function(key, entry){
+		console.log(entry.name);
+		dropdown.append($('<option></option>').attr('value', entry.name.toLowerCase()).text(entry.name));	
+		})
+});
+
+$('#country-dropdown').change(function(){
+    sendRequest("/reports/test/"+$(this).val(),"GET");
+    //+$(this).val(),"GET");
+});
 
 function sendRequest(url, method) {
   $.ajax({
@@ -8,12 +22,12 @@ function sendRequest(url, method) {
     async: false,
     
     success: function(response) {
-      console.log("Successful");
+      console.log("Successful >> url:" + url);
 //      let results = response.split(", ").map(Number);
       console.log(response);
       var jsonObj = JSON.parse(response);
       
-      loadChart(jsonObj.dataPoints, document.getElementById("country").value);
+      loadChart(jsonObj.dataPoints, document.getElementById("country-dropdown").value);
     },
 //    error: function(response) {
 //      console.log("Error");
