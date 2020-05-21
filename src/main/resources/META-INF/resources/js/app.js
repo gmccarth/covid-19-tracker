@@ -12,7 +12,7 @@ $.getJSON(countriesUrl,function (data) {
 });
 
 $('#country-dropdown').change(function(){
-    sendRequest("/reports/test/"+$(this).val(),"GET");
+    sendRequest("/reports/combined/"+$(this).val(),"GET");
     //+$(this).val(),"GET");
 });
 
@@ -26,8 +26,8 @@ function sendRequest(url, method) {
 //      let results = response.split(", ").map(Number);
       console.log(response);
       var jsonObj = JSON.parse(response);
-      
-      loadChart(jsonObj.dataPoints, document.getElementById("country-dropdown").value);
+      console.log("confirmed=" +JSON.stringify(jsonObj.confirmed));
+      loadChart(jsonObj.confirmed, jsonObj.deaths, document.getElementById("country-dropdown").value);
     },
 //    error: function(response) {
 //      console.log("Error");
@@ -54,16 +54,37 @@ function sendRequest(url, method) {
 //------------------------------
 var chart = "";
 
-function loadChart(dp, state) {
+function loadChart(confirmed, deaths, country) {
 	var chart = new CanvasJS.Chart("chartContainer", {
 		title:{
-			text: "COVID-19 confirmed cases over time for " + state.toUpperCase()              
+			text: "COVID-19 confirmed cases over time for " + country.toUpperCase()              
+		},
+		axisY: {
+			title: "Confirmed Cases",
+			lineColor: "#4F81BC",
+			tickColor: "#4F81BC",
+			labelFontColor: "#4F81BC"
+		},
+		axisY2: {
+			title: "Deaths",
+			lineColor: "#C0504E",
+			tickColor: "#C0504E",
+			labelFontColor: "#C0504E"
 		},
 		data: [              
 		{
 			// Change type to "doughnut", "line", "splineArea", etc.
 			type: "column",
-			dataPoints: dp
+			name: "Confirmed Cases",
+			showInLegend: true,
+			dataPoints: confirmed
+		},
+		{
+			type: "line",
+			name: "Deaths",
+			axisYType: "secondary",
+			showInLegend: true,
+			dataPoints: deaths
 		}
 		]
 	});

@@ -43,8 +43,8 @@ public class TrackerResource {
     
     @GET
     @Produces(MediaType.TEXT_PLAIN)
-    @Path("/test/{country}")
-    public JSONObject getAggregate(@PathParam String country) {
+    @Path("/confirmed/{country}")
+    public JSONObject getConfirmedCases(@PathParam String country) {
     	Map<String,Integer> cases = new HashMap<String,Integer>();
     	JSONArray confirmedArr = new JSONArray();
     	StringBuffer sb = new StringBuffer();
@@ -61,12 +61,54 @@ public class TrackerResource {
     	for(Map.Entry<String,Integer> entry : casesByDate.entrySet()) {
     		JSONObject sortedObj = new JSONObject();  
     		sortedObj.put("label", entry.getKey()) ;
-    		System.out.println("label=" + entry.getKey() + "->"+ entry.getValue() );
     		sortedObj.put("y", entry.getValue());
     		confirmedArr.put(sortedObj);
     	}
     	results.put("dataPoints",confirmedArr);
     	return results;
+    	
+    }
+    
+    @GET
+    @Produces(MediaType.TEXT_PLAIN)
+    @Path("/deaths/{country}")
+    public JSONObject getDeaths(@PathParam String country) {
+    	Map<String,Integer> cases = new HashMap<String,Integer>();
+    	JSONArray confirmedArr = new JSONArray();
+    	StringBuffer sb = new StringBuffer();
+    	AggregateIterable<Document> result = repo.getDeaths(country);
+    	MongoCursor<Document> iterator = result.iterator();
+    	while(iterator.hasNext()) {
+    		Document next = iterator.next();
+    		cases.put(next.getString("_id"), next.getInteger("deaths"));
+    		sb.append(next.getString("_id") + ":" + next.getInteger("deaths") + ", ");
+    	}
+    	TreeMap<String,Integer> casesByDate = new TreeMap<>();
+    	casesByDate.putAll(cases);
+    	JSONObject results = new JSONObject();
+    	for(Map.Entry<String,Integer> entry : casesByDate.entrySet()) {
+    		JSONObject sortedObj = new JSONObject();  
+    		sortedObj.put("label", entry.getKey()) ;
+    		sortedObj.put("y", entry.getValue());
+    		confirmedArr.put(sortedObj);
+    	}
+    	results.put("dataPoints",confirmedArr);
+    	return results;
+    	
+    }
+    
+    @GET
+    @Produces(MediaType.TEXT_PLAIN)
+    @Path("/combined/{country}")
+    public JSONObject getCombinedStats(@PathParam String country) {
+    	JSONObject results = new JSONObject();
+    	JSONObject confirmed = getConfirmedCases(country);
+    	JSONObject deaths = getDeaths(country);
+    	results.put("confirmed", confirmed.get("dataPoints"));
+    	results.put("deaths", deaths.get("dataPoints"));
+    	
+    	return results;
+    	
     	
     }
     
