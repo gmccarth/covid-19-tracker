@@ -315,7 +315,7 @@ public class TrackerResource {
     		jsonObj.put("name", county);
     		jsonArr.put(jsonObj);
     	}
-    	System.out.println("# of states:" + sortedCounties.size());
+    	System.out.println("# of counties:" + sortedCounties.size());
 
     	return jsonArr;
     }
