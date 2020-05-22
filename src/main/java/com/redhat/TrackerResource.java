@@ -27,12 +27,7 @@ public class TrackerResource {
 	@Inject
 	ReportRepository repo;
 	
-//    @GET
-//    @Produces(MediaType.TEXT_PLAIN)
-//    @Path("/{state}")
-//    public String daily(@PathParam String state) throws JSONException, IOException {
-//        return service.daily(state);
-//    }
+
     @GET
     @Produces(MediaType.TEXT_PLAIN)
     @Path("/country/{country}")
@@ -116,14 +111,14 @@ public class TrackerResource {
     @Produces(MediaType.TEXT_PLAIN)
     @Path("/countries")
     public JSONArray getAllCountries(){
-    	List<DailyReport> reports = repo.list("lastUpdate","2020-05-13");
+    	List<String> unsortedCountries = repo.getCountryList();
     	List<String> countries = new ArrayList<String> ();
-    	for(DailyReport report: reports) {
-    		if(!countries.contains(report.country.toUpperCase())) {
-    			countries.add(report.country.toUpperCase());
-        		System.out.println("country added:" + report.country);
+    	for(String country: unsortedCountries) {
+    		if(!countries.contains(country.toUpperCase())) {
+    			countries.add(country.toUpperCase());
+        		System.out.println("country added:" + country);
     		}
-    		else System.out.println("country skipped:" + report.country);
+    		else System.out.println("country skipped:" + country);
     	}
     	Collections.sort(countries);
     	System.out.println("# of countries:" + countries.size());
@@ -134,6 +129,32 @@ public class TrackerResource {
     		jsonObj.put("name", country);
     		jsonArr.put(jsonObj);
     	}
+    	return jsonArr;
+    }
+    
+    @GET
+    @Produces(MediaType.TEXT_PLAIN)
+    @Path("/states")
+    public JSONArray getUSStates(){
+    	List<String> unsortedStates = repo.getStatesList();
+    	List<String> sortedStates = new ArrayList<String> ();
+    	JSONArray jsonArr = new JSONArray();
+    	for(String state: unsortedStates) {
+    		if(!sortedStates.contains(state.toUpperCase())&!state.equalsIgnoreCase("recovered")) {
+    			sortedStates.add(state.toUpperCase());
+        		System.out.println("State added:" + state);
+
+    		}
+    		else System.out.println("State skipped:" + state);
+    	}
+    	Collections.sort(sortedStates);
+    	for(String state: sortedStates) {
+    		JSONObject jsonObj = new JSONObject();
+    		jsonObj.put("name", state);
+    		jsonArr.put(jsonObj);
+    	}
+    	System.out.println("# of countries:" + sortedStates.size());
+
     	return jsonArr;
     }
     

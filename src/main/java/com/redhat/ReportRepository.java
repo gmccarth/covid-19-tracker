@@ -57,6 +57,16 @@ public class ReportRepository implements PanacheMongoRepository<DailyReport> {
 		return countryList;
 	}
 	
+	public List<String> getStatesList(){
+		List<DailyReport> reports = list("{'lastUpdate':'2020-05-12','country':'us'}");
+		List<String> stateList = new ArrayList<String>();
+		for(DailyReport report : reports) {
+			stateList.add(report.provinceState);
+			System.out.println(report.provinceState);
+		}
+		return stateList;
+	}
+	
 	private MongoCollection getCollection(){
         return mongoClient.getDatabase("covid19report").getCollection("covid19report");
 	}
