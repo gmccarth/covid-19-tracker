@@ -94,6 +94,62 @@ public class TrackerResource {
     
     @GET
     @Produces(MediaType.TEXT_PLAIN)
+    @Path("/states/confirmed/{state}")
+    public JSONObject getConfirmedCasesInStates(@PathParam String state) {
+    	Map<String,Integer> cases = new HashMap<String,Integer>();
+    	JSONArray confirmedArr = new JSONArray();
+    	StringBuffer sb = new StringBuffer();
+    	AggregateIterable<Document> result = repo.getConfirmedCasesInStates(state);
+    	MongoCursor<Document> iterator = result.iterator();
+    	while(iterator.hasNext()) {
+    		Document next = iterator.next();
+    		cases.put(next.getString("_id"), next.getInteger("confirmedCases"));
+    		sb.append(next.getString("_id") + ":" + next.getInteger("confirmedCases") + ", ");
+    	}
+    	TreeMap<String,Integer> casesByDate = new TreeMap<>();
+    	casesByDate.putAll(cases);
+    	JSONObject results = new JSONObject();
+    	for(Map.Entry<String,Integer> entry : casesByDate.entrySet()) {
+    		JSONObject sortedObj = new JSONObject();  
+    		sortedObj.put("label", entry.getKey()) ;
+    		sortedObj.put("y", entry.getValue());
+    		confirmedArr.put(sortedObj);
+    	}
+    	results.put("dataPoints",confirmedArr);
+    	return results;
+    	
+    }
+    
+    @GET
+    @Produces(MediaType.TEXT_PLAIN)
+    @Path("states/deaths/{state}")
+    public JSONObject getDeathsInStates(@PathParam String state) {
+    	Map<String,Integer> cases = new HashMap<String,Integer>();
+    	JSONArray confirmedArr = new JSONArray();
+    	StringBuffer sb = new StringBuffer();
+    	AggregateIterable<Document> result = repo.getDeathsInStates(state);
+    	MongoCursor<Document> iterator = result.iterator();
+    	while(iterator.hasNext()) {
+    		Document next = iterator.next();
+    		cases.put(next.getString("_id"), next.getInteger("deaths"));
+    		sb.append(next.getString("_id") + ":" + next.getInteger("deaths") + ", ");
+    	}
+    	TreeMap<String,Integer> casesByDate = new TreeMap<>();
+    	casesByDate.putAll(cases);
+    	JSONObject results = new JSONObject();
+    	for(Map.Entry<String,Integer> entry : casesByDate.entrySet()) {
+    		JSONObject sortedObj = new JSONObject();  
+    		sortedObj.put("label", entry.getKey()) ;
+    		sortedObj.put("y", entry.getValue());
+    		confirmedArr.put(sortedObj);
+    	}
+    	results.put("dataPoints",confirmedArr);
+    	return results;
+    	
+    }
+    
+    @GET
+    @Produces(MediaType.TEXT_PLAIN)
     @Path("/combined/{country}")
     public JSONObject getCombinedStats(@PathParam String country) {
     	JSONObject results = new JSONObject();
@@ -103,8 +159,19 @@ public class TrackerResource {
     	results.put("deaths", deaths.get("dataPoints"));
     	
     	return results;
+    }
+    
+    @GET
+    @Produces(MediaType.TEXT_PLAIN)
+    @Path("states/combined/{state}")
+    public JSONObject getCombinedStatsForStates(@PathParam String state) {
+    	JSONObject results = new JSONObject();
+    	JSONObject confirmed = getConfirmedCasesInStates(state);
+    	JSONObject deaths = getDeathsInStates(state);
+    	results.put("confirmed", confirmed.get("dataPoints"));
+    	results.put("deaths", deaths.get("dataPoints"));
     	
-    	
+    	return results;
     }
     
     @GET
@@ -153,7 +220,7 @@ public class TrackerResource {
     		jsonObj.put("name", state);
     		jsonArr.put(jsonObj);
     	}
-    	System.out.println("# of countries:" + sortedStates.size());
+    	System.out.println("# of states:" + sortedStates.size());
 
     	return jsonArr;
     }

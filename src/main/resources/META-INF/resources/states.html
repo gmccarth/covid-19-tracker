@@ -1,8 +1,9 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Quarkusian COVID-19 Tracker</title>
+    <title>Quarkusian COVID-19 Tracker for US States</title>
     <style>
         h1, h2, h3, h4, h5, h6 {
             margin-bottom: 0.5rem;
@@ -111,21 +112,21 @@
     <script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
     
-    <script src="js/app.js"></script>
+
 <!-- 	<link rel="stylesheet" type="text/css" href="css/app.css">  -->
 </head>
 <body>
 
 <div class="banner lead">
   <img src="images/coronavirus.png" width="50%" /><img src="images/coronavirus.png" width="50%" />
-  <br> Quarkusian COVID-19 Tracker
+  <br> Quarkusian COVID-19 Tracker for US States
 </div>
 
 <div class="container">
     <div class="left-column">
 
-   <p>Please select the country: 
-   <select id="country-dropdown" name="country" onChange="sendRequest();">
+   <p>Please select the state: 
+   <select id="state-dropdown" name="state" onChange="sendRequest();">
 
    
 </select>
@@ -148,16 +149,14 @@
 </div>
 
 <div id="imageSer" class="container">
-&nbsp;&nbsp;<a href="states.html">COVID-19 tracking for US States</a>
-
-
+&nbsp;&nbsp;<a href="index.html">COVID-19 tracking for Countries</a>
 <p>	<img src="images/quarkus.png" width="200" align="middle" />&nbsp;&nbsp;&nbsp;<img src="images/Logo-Red_Hat-AMQ-A-Standard-RGB.png" width="160" align="middle" /><img src="images/mongodb-logo.png" width="200" align="middle" />
 <img src="images/post-logo-apache-camel-k-native.png" width="200" align="middle" /><img src="images/graalvm.png" width="200" align="middle" />
 </div>
 	<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest"></script>
 	<script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>  
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.4.0/Chart.min.js"></script>
-	<script type="text/javascript" src="js/app.js"></script>
+	<script type="text/javascript" src="js/appStates.js"></script>
 
 
 </body>

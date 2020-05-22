@@ -46,6 +46,24 @@ public class ReportRepository implements PanacheMongoRepository<DailyReport> {
 							));
 	}
 	
+	public AggregateIterable<Document> getConfirmedCasesInStates(String state){
+
+		return getCollection().aggregate(Arrays.asList(
+					Aggregates.match(Filters.and(Filters.eq("country","us"),Filters.eq("provinceState",state.toLowerCase()))),
+					Aggregates.group("$lastUpdate", Accumulators.sum("confirmedCases", "$confirmedCases")),
+					Aggregates.project(Projections.include("country","confirmedCases"))
+							));
+	}
+	
+	public AggregateIterable<Document> getDeathsInStates(String state){
+
+		return getCollection().aggregate(Arrays.asList(
+					Aggregates.match(Filters.and(Filters.eq("country","us"),Filters.eq("provinceState",state.toLowerCase()))),
+					Aggregates.group("$lastUpdate", Accumulators.sum("deaths", "$deaths")),
+					Aggregates.project(Projections.include("country","deaths"))
+							));
+	}
+	
 	
 	public List<String> getCountryList(){
 		List<DailyReport> reports = list("lastUpdate","2020-05-12");
