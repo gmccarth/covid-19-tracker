@@ -3,7 +3,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Quarkusian COVID-19 Tracker for US States</title>
+    <title>Quarkusian COVID-19 Tracker for US States/Counties</title>
     <style>
         h1, h2, h3, h4, h5, h6 {
             margin-bottom: 0.5rem;
@@ -60,6 +60,9 @@
             color: #e83e8c;
             word-break: break-word;
         }
+        p.small {
+  			font-size: 12px;
+		}
 
         .left-column {
             padding: .75rem;
@@ -119,7 +122,7 @@
 
 <div class="banner lead">
   <img src="images/coronavirus.png" width="50%" /><img src="images/coronavirus.png" width="50%" />
-  <br> Quarkusian COVID-19 Tracker for US States
+  <br> Quarkusian COVID-19 Tracker for US States/Counties
 </div>
 
 <div class="container">
@@ -127,9 +130,11 @@
 
    <p>Please select the state: 
    <select id="state-dropdown" name="state" onChange="sendRequest();">
-
+   </select>
    
-</select>
+  <p class="small"><i>Optional: select the County</i>
+   <select id="county-dropdown" name="county" onChange="sendRequest();">
+	</select></p>
     	<div id="chartContainer" style="height: 300px; width: 100%;"></div>   
     </div>
     <div class="right-column">
@@ -149,7 +154,7 @@
 </div>
 
 <div id="imageSer" class="container">
-&nbsp;&nbsp;<a href="index.html">COVID-19 tracking for Countries</a>
+&nbsp;&nbsp;&nbsp;<a href="index.html">COVID-19 tracking for Countries</a>
 <p>	<img src="images/quarkus.png" width="200" align="middle" />&nbsp;&nbsp;&nbsp;<img src="images/Logo-Red_Hat-AMQ-A-Standard-RGB.png" width="160" align="middle" /><img src="images/mongodb-logo.png" width="200" align="middle" />
 <img src="images/post-logo-apache-camel-k-native.png" width="200" align="middle" /><img src="images/graalvm.png" width="200" align="middle" />
 </div>

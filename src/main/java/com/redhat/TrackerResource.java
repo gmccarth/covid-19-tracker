@@ -122,12 +122,68 @@ public class TrackerResource {
     
     @GET
     @Produces(MediaType.TEXT_PLAIN)
+    @Path("/states/confirmed/{state}/{county}")
+    public JSONObject getConfirmedCasesInCounties(@PathParam String state, @PathParam String county) {
+    	Map<String,Integer> cases = new HashMap<String,Integer>();
+    	JSONArray confirmedArr = new JSONArray();
+    	StringBuffer sb = new StringBuffer();
+    	AggregateIterable<Document> result = repo.getConfirmedCasesInCounties(state, county);
+    	MongoCursor<Document> iterator = result.iterator();
+    	while(iterator.hasNext()) {
+    		Document next = iterator.next();
+    		cases.put(next.getString("_id"), next.getInteger("confirmedCases"));
+    		sb.append(next.getString("_id") + ":" + next.getInteger("confirmedCases") + ", ");
+    	}
+    	TreeMap<String,Integer> casesByDate = new TreeMap<>();
+    	casesByDate.putAll(cases);
+    	JSONObject results = new JSONObject();
+    	for(Map.Entry<String,Integer> entry : casesByDate.entrySet()) {
+    		JSONObject sortedObj = new JSONObject();  
+    		sortedObj.put("label", entry.getKey()) ;
+    		sortedObj.put("y", entry.getValue());
+    		confirmedArr.put(sortedObj);
+    	}
+    	results.put("dataPoints",confirmedArr);
+    	return results;
+    	
+    }
+    
+    @GET
+    @Produces(MediaType.TEXT_PLAIN)
     @Path("states/deaths/{state}")
     public JSONObject getDeathsInStates(@PathParam String state) {
     	Map<String,Integer> cases = new HashMap<String,Integer>();
     	JSONArray confirmedArr = new JSONArray();
     	StringBuffer sb = new StringBuffer();
     	AggregateIterable<Document> result = repo.getDeathsInStates(state);
+    	MongoCursor<Document> iterator = result.iterator();
+    	while(iterator.hasNext()) {
+    		Document next = iterator.next();
+    		cases.put(next.getString("_id"), next.getInteger("deaths"));
+    		sb.append(next.getString("_id") + ":" + next.getInteger("deaths") + ", ");
+    	}
+    	TreeMap<String,Integer> casesByDate = new TreeMap<>();
+    	casesByDate.putAll(cases);
+    	JSONObject results = new JSONObject();
+    	for(Map.Entry<String,Integer> entry : casesByDate.entrySet()) {
+    		JSONObject sortedObj = new JSONObject();  
+    		sortedObj.put("label", entry.getKey()) ;
+    		sortedObj.put("y", entry.getValue());
+    		confirmedArr.put(sortedObj);
+    	}
+    	results.put("dataPoints",confirmedArr);
+    	return results;
+    	
+    }
+    
+    @GET
+    @Produces(MediaType.TEXT_PLAIN)
+    @Path("states/deaths/{state}/{county}")
+    public JSONObject getDeathsInCounties(@PathParam String state, @PathParam String county) {
+    	Map<String,Integer> cases = new HashMap<String,Integer>();
+    	JSONArray confirmedArr = new JSONArray();
+    	StringBuffer sb = new StringBuffer();
+    	AggregateIterable<Document> result = repo.getDeathsInCounties(state, county);
     	MongoCursor<Document> iterator = result.iterator();
     	while(iterator.hasNext()) {
     		Document next = iterator.next();
@@ -168,6 +224,19 @@ public class TrackerResource {
     	JSONObject results = new JSONObject();
     	JSONObject confirmed = getConfirmedCasesInStates(state);
     	JSONObject deaths = getDeathsInStates(state);
+    	results.put("confirmed", confirmed.get("dataPoints"));
+    	results.put("deaths", deaths.get("dataPoints"));
+    	
+    	return results;
+    }
+    
+    @GET
+    @Produces(MediaType.TEXT_PLAIN)
+    @Path("states/combined/{state}/{county}")
+    public JSONObject getCombinedStatsForCounties(@PathParam String state, @PathParam String county) {
+    	JSONObject results = new JSONObject();
+    	JSONObject confirmed = getConfirmedCasesInCounties(state, county);
+    	JSONObject deaths = getDeathsInCounties(state, county);
     	results.put("confirmed", confirmed.get("dataPoints"));
     	results.put("deaths", deaths.get("dataPoints"));
     	
@@ -221,6 +290,32 @@ public class TrackerResource {
     		jsonArr.put(jsonObj);
     	}
     	System.out.println("# of states:" + sortedStates.size());
+
+    	return jsonArr;
+    }
+    
+    @GET
+    @Produces(MediaType.TEXT_PLAIN)
+    @Path("/counties/{state}")
+    public JSONArray getCountiesinState(@PathParam String state){
+    	List<String> unsortedCounties = repo.getCountyList(state);
+    	List<String> sortedCounties = new ArrayList<String> ();
+    	JSONArray jsonArr = new JSONArray();
+    	for(String county: unsortedCounties) {
+    		if(!sortedCounties.contains(county.toUpperCase())&!county.equalsIgnoreCase("unassigned")) {
+    			sortedCounties.add(county.toUpperCase());
+        		System.out.println("State added:" + county);
+
+    		}
+    		else System.out.println("State skipped:" + county);
+    	}
+    	Collections.sort(sortedCounties);
+    	for(String county: sortedCounties) {
+    		JSONObject jsonObj = new JSONObject();
+    		jsonObj.put("name", county);
+    		jsonArr.put(jsonObj);
+    	}
+    	System.out.println("# of states:" + sortedCounties.size());
 
     	return jsonArr;
     }

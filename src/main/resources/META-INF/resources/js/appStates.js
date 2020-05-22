@@ -1,22 +1,32 @@
 var dropdown = $('#state-dropdown');
+var countyDropdown = $('#county-dropdown');
 dropdown.empty();
 dropdown.append('<option selected="true" disabled>Choose US State</option>');
 dropdown.prop('selectedIndex',0);
-var countriesUrl='reports/states';
+clearCountyDropdown();
+var statesUrl='reports/states';
+var countiesUrl='reports/counties/'
 
-$.getJSON(countriesUrl,function (data) {
+$.getJSON(statesUrl,function (data) {
 	$.each(data, function(key, entry){
-		console.log(entry.name);
+//		console.log(entry.name);
 		dropdown.append($('<option></option>').attr('value', entry.name.toLowerCase()).text(entry.name));	
 		})
 });
 
+
 $('#state-dropdown').change(function(){
-    sendRequest("/reports/states/combined/"+$(this).val(),"GET");
+	clearCountyDropdown();
+	loadCounties();
+    sendRequest("/reports/states/combined/"+$(this).val(),"GET", $(this).val());
+    //+$(this).val(),"GET");
+});
+$('#county-dropdown').change(function(){
+    sendRequest("/reports/states/combined/"+$('#state-dropdown').val()+"/"+$(this).val(),"GET", $(this).val()+", "+$('#state-dropdown').val());
     //+$(this).val(),"GET");
 });
 
-function sendRequest(url, method) {
+function sendRequest(url, method, reportType) {
   $.ajax({
     url: url,
     async: false,
@@ -24,10 +34,10 @@ function sendRequest(url, method) {
     success: function(response) {
       console.log("Successful >> url:" + url);
 //      let results = response.split(", ").map(Number);
-      console.log(response);
+//      console.log(response);
       var jsonObj = JSON.parse(response);
-      console.log("confirmed=" +JSON.stringify(jsonObj.confirmed));
-      loadChart(jsonObj.confirmed, jsonObj.deaths, document.getElementById("state-dropdown").value);
+//      console.log("confirmed=" +JSON.stringify(jsonObj.confirmed));
+      loadChart(jsonObj.confirmed, jsonObj.deaths, reportType);
     },
 //    error: function(response) {
 //      console.log("Error");
@@ -46,18 +56,32 @@ function sendRequest(url, method) {
   });
  }
 
+function loadCounties(){
+	console.log("in loadCounties");
+	console.log("state: " + $('#state-dropdown').val());
+	$.getJSON(countiesUrl +$('#state-dropdown').val(),function (data) {
+		$.each(data, function(key, entry){
+			console.log(entry.name);
+			countyDropdown.append($('<option></option>').attr('value', entry.name.toLowerCase()).text(entry.name));	
+			})
+	})
+}
+function clearCountyDropdown() {
+	countyDropdown.empty();
+	countyDropdown.append('<option selected="true" disabled>Choose county</option>');
+	countyDropdown.prop('selectedIndex',0);
 
-
+}
 
 //------------------------------
 // Chart to display predictions
 //------------------------------
 var chart = "";
 
-function loadChart(confirmed, deaths, country) {
+function loadChart(confirmed, deaths, state) {
 	var chart = new CanvasJS.Chart("chartContainer", {
 		title:{
-			text: "COVID-19 confirmed cases over time for " + country.toUpperCase()              
+			text: "COVID-19 confirmed cases over time for " + state.toUpperCase()              
 		},
 		axisY: {
 			title: "Confirmed Cases",

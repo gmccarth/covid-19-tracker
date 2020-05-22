@@ -64,6 +64,24 @@ public class ReportRepository implements PanacheMongoRepository<DailyReport> {
 							));
 	}
 	
+	public AggregateIterable<Document> getConfirmedCasesInCounties(String state, String county){
+
+		return getCollection().aggregate(Arrays.asList(
+					Aggregates.match(Filters.and(Filters.eq("country","us"),Filters.eq("provinceState",state.toLowerCase()),Filters.eq("admin2",county))),
+					Aggregates.group("$lastUpdate", Accumulators.sum("confirmedCases", "$confirmedCases")),
+					Aggregates.project(Projections.include("country","confirmedCases"))
+							));
+	}
+	
+	public AggregateIterable<Document> getDeathsInCounties(String state, String county){
+
+		return getCollection().aggregate(Arrays.asList(
+					Aggregates.match(Filters.and(Filters.eq("country","us"),Filters.eq("provinceState",state.toLowerCase()),Filters.eq("admin2",county))),
+					Aggregates.group("$lastUpdate", Accumulators.sum("deaths", "$deaths")),
+					Aggregates.project(Projections.include("country","deaths"))
+							));
+	}
+	
 	
 	public List<String> getCountryList(){
 		List<DailyReport> reports = list("lastUpdate","2020-05-12");
@@ -83,6 +101,16 @@ public class ReportRepository implements PanacheMongoRepository<DailyReport> {
 			System.out.println(report.provinceState);
 		}
 		return stateList;
+	}
+	
+	public List<String> getCountyList(String state){
+		List<DailyReport> reports = list("{'lastUpdate':'2020-05-12','country':'us', 'provinceState':?1}", state);
+		List<String> countyList = new ArrayList<String>();
+		for(DailyReport report : reports) {
+			countyList.add(report.admin2);
+			System.out.println(report.admin2);
+		}
+		return countyList;
 	}
 	
 	private MongoCollection getCollection(){
